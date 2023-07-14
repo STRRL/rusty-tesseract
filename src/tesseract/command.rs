@@ -60,7 +60,15 @@ pub(crate) fn run_tesseract_command(command: &mut Command) -> TessResult<String>
 
     match status.code() {
         Some(0) => Ok(out),
-        _ => Err(TessError::VersionError(err)),
+        Some(exitcode) => Err(TessError::VersionError(format!(
+            "Process exited with code: {}, stderr: {}",
+            exitcode, err
+        ))),
+        None => Err(TessError::VersionError(format!(
+            "Process terminated by signal, stderr: {}",
+            err
+        ))),
+        // _ => Err(TessError::VersionError(err)),
     }
 }
 
